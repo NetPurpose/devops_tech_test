@@ -65,6 +65,16 @@ func (s *Session) setupChannel() error {
 			return err
 		}
 		s.channel = ch
+		_, err = ch.QueueDeclare(
+			s.name,
+			false,
+			false,
+			false,
+			false,
+			nil)
+		if err != nil {
+			return err
+		}
 		return nil
 	})
 }
@@ -86,8 +96,8 @@ func (s *Session) Push(msg []byte) error {
 
 }
 
-func (s *Session) GetOne() ([]byte, error) {
-	d, ok, err := s.channel.Get(s.name, false)
+func (s *Session) GetOne(channel string) ([]byte, error) {
+	d, ok, err := s.channel.Get(channel, false)
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +114,7 @@ func (s *Session) Stream(name string) (<-chan amqp.Delivery, error) {
 		return nil, errors.New("connection not ready")
 	}
 	return s.channel.Consume(
-		s.name,
+		name,
 		"",
 		false,
 		false,
@@ -120,6 +130,8 @@ func tryUntilComplete(fn callback) error {
 		if err != nil {
 			log.Println("Failed. Retrying...")
 			<-time.After(retryHoldoff)
+		} else {
+			return nil
 		}
 	}
 }

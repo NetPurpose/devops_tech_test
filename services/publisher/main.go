@@ -32,13 +32,16 @@ func send(c *gin.Context, s *Session) {
 }
 
 func receive(c *gin.Context, s *Session) {
-	msg, err := s.GetOne()
+	msg, err := s.GetOne("Out")
 	if err != nil {
 		c.JSON(404, gin.H{"message": "Queue not ready yet"})
+		return
 	}
 	if msg == nil {
 		c.JSON(404, gin.H{"message": "No messages in queue"})
+		return
 	}
+
 	c.JSON(200, gin.H{"message": string(msg)})
 
 }

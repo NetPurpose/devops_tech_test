@@ -1,24 +1,24 @@
 # Instructions
 
-Your goal here is to build some tooling to allow a new developer to relatively quickly an easilly run the multi-component dummy application contained within this repo.
+The goal of this technical test is to take the dummy application (two go-lang based microservices) and "deploy" them in a local stack.
+
+The aim of the local stack is to allow the hypothetical developer to easily spin up a local environment for testing.
+Bonus points for also demonstrating ability to instrument things such as:-
+* monitoring tools (e.g. prometheus) 
+* advanced load balancers (traefik, Kong etc)
+* a readiness check
+* anything else you think might be useful/ helpful for developers working on this "application"
 
 The application consists of:
 
-a client ui  (`/frontend`)
-a backend server (`/publisher`)
-rabbitmq
-an asynchronous worker (`/consumer`)
+1. A web server `/services/publisher`
+1. An asynchronous worker `/services/consumer`
 
+(more details on each can be found in their folders)
 
-The expected flow of messages is that the client ui connects to the server via a websocket and can then send messages to the server. The server will then pass those messages on to the asynchronous worker via rabbitmq.
+The two applications will talk to each other via a rabbitmq server. Once successfully configured it should be possible to send an http `POST` request to the webserver at `/send` with a JSON payload of `{"body": <some message>}` and afterwards receive a message from
+`/receive` via a `GET` request which will have content with your original message embedded in it.
 
-The worker will then respond with a very unimaginative reply, which will also be sent to rabbitmq and back to the client ui via the backend server.
-
-
-There are a few points to consider:
-
-The microservices need to be told where each other is
-This is for local testing
 
 
 Some technologies which may be of interest (not all of them need to be used!):

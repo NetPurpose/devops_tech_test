@@ -96,8 +96,11 @@ func (s *Session) Push(msg []byte) error {
 
 }
 
-func (s *Session) GetOne(channel string) ([]byte, error) {
-	d, ok, err := s.channel.Get(channel, false)
+func (s *Session) GetOne(name string) ([]byte, error) {
+	if !s.IsReady {
+		return nil, errors.New("connection not ready")
+	}
+	d, ok, err := s.channel.Get(name, false)
 	if err != nil {
 		return nil, err
 	}

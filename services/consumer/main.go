@@ -1,15 +1,18 @@
 package main
 
-import "time"
-import "github.com/streadway/amqp"
-import "fmt"
-import "log"
+import (
+	"fmt"
+	"github.com/streadway/amqp"
+	"log"
+	"os"
+	"time"
+)
 
 const holdOff = 2 * time.Second
 
 func getStream(s *Session) <-chan amqp.Delivery {
 	for {
-		stream, err := s.Stream("dummy")
+		stream, err := s.Stream(os.Getenv("INBOUND"))
 		if err != nil {
 			<-time.After(holdOff)
 			continue
@@ -33,7 +36,7 @@ func listen(s *Session) {
 
 func main() {
 	forever := make(chan bool)
-	s := New("Out")
+	s := New(os.Getenv("OUTBOUND"))
 	go listen(s)
 	<-forever
 }

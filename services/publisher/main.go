@@ -2,6 +2,7 @@ package main
 
 import "github.com/gin-gonic/gin"
 import "log"
+import "os"
 
 type Message struct {
 	Body string `form:"body" json:"body" binding:"required"`
@@ -32,7 +33,7 @@ func send(c *gin.Context, s *Session) {
 }
 
 func receive(c *gin.Context, s *Session) {
-	msg, err := s.GetOne("Out")
+	msg, err := s.GetOne(os.Getenv("INBOUND"))
 	if err != nil {
 		c.JSON(404, gin.H{"message": "Queue not ready yet"})
 		return
@@ -47,7 +48,7 @@ func receive(c *gin.Context, s *Session) {
 }
 
 func main() {
-	s := New("dummy")
+	s := New(os.Getenv("OUTBOUND"))
 	r := gin.Default()
 	r.GET("/ping", func(c *gin.Context) {
 		ping(c, s)
